@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OEE Control | Eficiência Industrial</title>
+<style>
+:root{--bg:#0b1220;--panel:#121d2e;--panel2:#172438;--line:#26364c;--text:#eef4fb;--muted:#9aabc0;--cyan:#42c6d8;--blue:#648cff;--green:#35c58a;--amber:#f2b84b;--red:#f16d75;--radius:16px}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#0b1220,#101c2d 55%,#0b1220);color:var(--text);font:15px/1.5 Inter,Segoe UI,Arial,sans-serif}
+button,input,select{font:inherit}button{cursor:pointer;border:1px solid var(--line);background:#1c2b40;color:var(--text);padding:10px 14px;border-radius:10px;font-weight:650}button:hover{filter:brightness(1.15)}button.primary{background:linear-gradient(120deg,#197d98,#3565c8);border:0}button.ghost{background:transparent}button.danger{color:#ff9ca1}
+header{padding:24px clamp(16px,4vw,48px) 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,#24b8c8,#426ee4);display:grid;place-items:center;font-size:22px;font-weight:900}.brand h1{font-size:20px;margin:0;letter-spacing:.5px}.brand p{margin:2px 0 0;color:var(--muted);font-size:12px}.header-actions{display:flex;gap:8px;flex-wrap:wrap}
+main{max-width:1440px;margin:auto;padding:24px clamp(14px,3vw,38px) 50px}.intro{display:flex;justify-content:space-between;gap:20px;align-items:end;margin-bottom:20px;flex-wrap:wrap}.eyebrow{color:var(--cyan);font-weight:800;text-transform:uppercase;letter-spacing:1.5px;font-size:11px}.intro h2{font-size:clamp(24px,3vw,34px);margin:5px 0}.intro p{margin:0;color:var(--muted);max-width:720px}.date-label{color:var(--muted);font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}.card{background:linear-gradient(160deg,var(--panel),#101a29);border:1px solid var(--line);border-radius:var(--radius);padding:18px;min-width:0;box-shadow:0 12px 28px #0002}.span-12{grid-column:span 12}.span-8{grid-column:span 8}.span-7{grid-column:span 7}.span-6{grid-column:span 6}.span-5{grid-column:span 5}.span-4{grid-column:span 4}.section-title{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}.section-title h3{font-size:15px;margin:0}.section-title small{color:var(--muted)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.kpi{background:#17263a;border:1px solid #2a3d55;border-radius:13px;padding:15px}.kpi .label{color:var(--muted);font-size:12px}.kpi .value{font-size:clamp(22px,3vw,32px);font-weight:800;margin:6px 0 3px;font-variant-numeric:tabular-nums}.kpi .hint{font-size:11px;color:var(--muted)}.kpi.oee{border-color:#287e92;background:linear-gradient(145deg,#12364a,#17263a)}.kpi.oee .value{color:#63d8e5}
+.form-grid{display:grid;grid-template-columns:repeat(5,minmax(130px,1fr));gap:12px}.field label{display:block;font-size:11px;color:var(--muted);margin:0 0 6px}.field input,.field select{width:100%;background:#0c1726;border:1px solid #30435b;border-radius:9px;color:var(--text);padding:10px;min-width:0}.field input:focus{outline:2px solid #318ba8;border-color:transparent}.form-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.hintline{font-size:11px;color:var(--muted);margin-top:9px}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:12px}table{border-collapse:collapse;width:100%;min-width:850px}th,td{padding:11px 12px;text-align:left;border-bottom:1px solid #26364c;font-size:12px}th{color:#a9bbd0;background:#17263a;font-weight:700;position:sticky;top:0}td input{width:100%;min-width:68px;background:#0b1624;border:1px solid #30435b;color:var(--text);border-radius:7px;padding:7px}tr:last-child td{border-bottom:0}.empty{text-align:center;color:var(--muted);padding:25px}
+.chart{width:100%;height:230px;display:block}.legend{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:11px}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}
+.analysis{padding:15px;border-radius:12px;background:#14273a;border-left:3px solid var(--cyan);color:#dce8f5}.analysis strong{color:#fff}.analysis p{margin:6px 0 0}.pill{display:inline-flex;align-items:center;padding:4px 8px;border-radius:20px;font-size:10px;font-weight:800;background:#24384d;color:#bcd0e5}.pill.good{background:#153d36;color:#7ce0b7}.pill.warn{background:#49391d;color:#ffd27a}.pill.bad{background:#4a252c;color:#ff9da4}
+.footer{margin-top:18px;color:#8294aa;font-size:11px;text-align:center}
+#toast{position:fixed;bottom:18px;right:18px;background:#1b3347;border:1px solid #3a6076;color:#e8f7ff;padding:12px 16px;border-radius:10px;display:none;z-index:20;box-shadow:0 8px 30px #0006}
+body.presentation header .header-actions,body.presentation .entry-card,body.presentation .data-card,body.presentation .footer,body.presentation .intro .date-label{display:none}
+body.presentation main{max-width:1600px;padding-top:30px}body.presentation .intro{margin-bottom:28px}body.presentation .card{box-shadow:none}
+@media(max-width:950px){.span-8,.span-7,.span-5,.span-4{grid-column:span 12}.form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.kpis{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){header{padding:16px}.header-actions button{font-size:11px;padding:8px}.form-grid{grid-template-columns:1fr}.kpis{grid-template-columns:1fr 1fr}.kpi{padding:12px}.card{padding:14px}.intro h2{font-size:24px}}
+@media print{body{background:#fff;color:#111}.card,.kpi{background:#fff!important;color:#111;border:1px solid #bbb;box-shadow:none}.kpi .label,.kpi .hint,.intro p,.date-label,.section-title small,.footer{color:#444}.kpi .value{color:#111!important}header{border-color:#bbb}.header-actions,.entry-card,.data-card{display:none!important}main{padding:10px;max-width:none}.analysis{background:#f3f7fa;color:#111}.analysis strong{color:#111}.chart{max-height:200px}}
+</style>
+</head>
+<body>
+<header>
+ <div class="brand"><div class="logo">O</div><div><h1>OEE CONTROL</h1><p>Eficiência Global dos Equipamentos · Engenharia de Produção</p></div></div>
+ <div class="header-actions">
+  <button class="ghost" id="sampleBtn">Carregar exemplo</button>
+  <button class="ghost" id="importBtn">Importar CSV</button>
+  <button class="ghost" id="exportBtn">Exportar dados</button>
+  <button class="ghost" id="printBtn">PDF / Imprimir</button>
+  <button class="primary" id="presentBtn">Modo apresentação</button>
+  <input type="file" id="csvFile" accept=".csv,text/csv" hidden>
+ </div>
+</header>
+<main>
+ <section class="intro">
+  <div><div class="eyebrow">Painel de desempenho produtivo</div><h2>Monitoramento de eficiência</h2><p>Registre os dados do equipamento, acompanhe os indicadores e identifique oportunidades de melhoria com cálculos automáticos.</p></div>
+  <div class="date-label" id="today"></div>
+ </section>
+ <section class="grid">
+  <div class="card span-12">
+   <div class="section-title"><h3>Indicadores principais</h3><small>Atualização automática</small></div>
+   <div class="kpis">
+    <div class="kpi oee"><div class="label">OEE GERAL</div><div class="value" id="oeeVal">—</div><div class="hint" id="oeeStatus">Aguardando dados</div></div>
+    <div class="kpi"><div class="label">DISPONIBILIDADE</div><div class="value" id="availVal">—</div><div class="hint">Tempo operando / tempo planejado</div></div>
+    <div class="kpi"><div class="label">PERFORMANCE</div><div class="value" id="perfVal">—</div><div class="hint">Produção teórica / tempo operando</div></div>
+    <div class="kpi"><div class="label">QUALIDADE</div><div class="value" id="qualVal">—</div><div class="hint">Peças boas / peças totais</div></div>
+   </div>
+  </div>
+  <div class="card span-12 entry-card">
+   <div class="section-title"><h3>Entrada de dados da produção</h3><small>Preencha os campos e adicione o registro</small></div>
+   <form id="entryForm">
+    <div class="form-grid">
+     <div class="field"><label for="machine">Equipamento / linha</label><input id="machine" required maxlength="60" placeholder="Ex.: Linha 01"></div>
+     <div class="field"><label for="date">Data</label><input id="date" type="date" required></div>
+     <div class="field"><label for="planned">Tempo planejado (min)</label><input id="planned" type="number" min="0.01" step="any" required placeholder="480"></div>
+     <div class="field"><label for="stop">Paradas (min)</label><input id="stop" type="number" min="0" step="any" required placeholder="60"></div>
+     <div class="field"><label for="cycle">Ciclo ideal (seg/peça)</label><input id="cycle" type="number" min="0.001" step="any" required placeholder="30"></div>
+     <div class="field"><label for="total">Peças produzidas (un.)</label><input id="total" type="number" min="1" step="1" required placeholder="700"></div>
+     <div class="field"><label for="good">Peças boas (un.)</label><input id="good" type="number" min="0" step="1" required placeholder="665"></div>
+    </div>
+    <div class="form-actions"><button type="submit" class="primary">Adicionar registro</button><button type="reset" class="ghost">Limpar campos</button></div>
+    <div class="hintline">Validações: tempo de parada não pode superar o tempo planejado; peças boas não podem superar a produção total; ciclo e tempo planejado devem ser positivos.</div>
+   </form>
+  </div>
+  <div class="card span-12 data-card">
+   <div class="section-title"><h3>Registros de produção</h3><small id="recordCount">0 registros</small></div>
+   <div class="table-wrap"><table><thead><tr><th>Equipamento</th><th>Data</th><th>Planejado (min)</th><th>Paradas (min)</th><th>Ciclo (s)</th><th>Total</th><th>Boas</th><th>OEE</th><th>Ação</th></tr></thead><tbody id="recordsBody"><tr><td colspan="9" class="empty">Nenhum registro. Insira dados ou carregue o exemplo.</td></tr></tbody></table></div>
+  </div>
+  <div class="card span-7">
+   <div class="section-title"><h3>Composição do OEE</h3><small>Indicadores em %</small></div>
+   <svg id="componentsChart" class="chart" viewBox="0 0 600 230" role="img" aria-label="Gráfico de disponibilidade, performance e qualidade"></svg>
+   <div class="legend"><span><i class="dot" style="background:#42c6d8"></i>Disponibilidade</span><span><i class="dot" style="background:#648cff"></i>Performance</span><span><i class="dot" style="background:#35c58a"></i>Qualidade</span></div>
+  </div>
+  <div class="card span-5">
+   <div class="section-title"><h3>OEE por equipamento</h3><small>Comparação</small></div>
+   <svg id="equipmentChart" class="chart" viewBox="0 0 440 230" role="img" aria-label="Gráfico de OEE por equipamento"></svg>
+  </div>
+  <div class="card span-12">
+   <div class="section-title"><h3>Interpretação e recomendação</h3><small>Análise automática dos dados</small></div>
+   <div class="analysis" id="analysisBox"><strong>Aguardando informações.</strong><p>Adicione registros para receber uma leitura dos indicadores e sugestões de investigação.</p></div>
+  </div>
+ </section>
+ <div class="footer">OEE Control · Ferramenta acadêmica demonstrativa · Os dados ficam salvos neste navegador.</div>
+</main>
+<div id="toast" role="status"></div>
+<script>
+const $=id=>document.getElementById(id);
+const STORE='oeeControlData_v1';
+let records=[];
+const today=new Date(); $('today').textContent='Data de referência: '+today.toLocaleDateString('pt-BR');
+$('date').value=new Date().toISOString().slice(0,10);
+function toast(msg){const t=$('toast');t.textContent=msg;t.style.display='block';clearTimeout(window._toastTimer);window._toastTimer=setTimeout(()=>t.style.display='none',2600)}
+function calc(r){
+ const run=r.planned-r.stop;
+ if(r.planned<=0||run<=0||r.cycle<=0||r.total<=0)return null;
+ const availability=run/r.planned;
+ const performance=(r.cycle/60*r.total)/run;
+ const quality=r.good/r.total;
+ return {run,availability,performance,quality,oee:availability*performance*quality};
+}
+function pct(v){return (v*100).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+'%'}
+function save(){try{localStorage.setItem(STORE,JSON.stringify(records))}catch(e){toast('Não foi possível salvar neste navegador.')}}
+function load(){try{const raw=localStorage.getItem(STORE);if(raw){const x=JSON.parse(raw);if(Array.isArray(x))records=x}}catch(e){records=[]}}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function render(){
+ const valid=records.map((r,i)=>({r,i,c:calc(r)})).filter(x=>x.c);
+ $('recordCount').textContent=records.length+' registro(s)';
+ $('recordsBody').innerHTML=records.length?records.map((r,i)=>{const c=calc(r);return `<tr><td>${esc(r.machine)}</td><td>${esc(r.date)}</td><td>${r.planned}</td><td>${r.stop}</td><td>${r.cycle}</td><td>${r.total}</td><td>${r.good}</td><td>${c?pct(c.oee):'—'}</td><td><button class="danger" onclick="removeRecord(${i})" aria-label="Excluir registro">Excluir</button></td></tr>`}).join(''):'<tr><td colspan="9" class="empty">Nenhum registro. Insira dados ou carregue o exemplo.</td></tr>';
+ if(!valid.length){['oeeVal','availVal','perfVal','qualVal'].forEach(id=>$(id).textContent='—');$('oeeStatus').textContent='Aguardando dados';$('analysisBox').innerHTML='<strong>Aguardando informações.</strong><p>Adicione registros válidos para receber uma análise.</p>';drawComponents(null);drawEquipment([]);return}
+ // Aggregate by summing time and quantities; weighted calculation across all records.
+ const planned=valid.reduce((s,x)=>s+x.r.planned,0), run=valid.reduce((s,x)=>s+x.c.run,0);
+ const ideal=valid.reduce((s,x)=>s+x.r.cycle/60*x.r.total,0);
+ const total=valid.reduce((s,x)=>s+x.r.total,0), good=valid.reduce((s,x)=>s+x.r.good,0);
+ const a=run/planned,p=ideal/run,q=good/total,o=a*p*q;
+ $('oeeVal').textContent=pct(o);$('availVal').textContent=pct(a);$('perfVal').textContent=pct(p);$('qualVal').textContent=pct(q);
+ const status=o>=.85?'Referência de excelência atingida':o>=.65?'Há oportunidades de melhoria':'Atenção: perdas relevantes identificadas';
+ $('oeeStatus').textContent=status;
+ const factors=[['Disponibilidade',a],['Performance',p],['Qualidade',q]].sort((x,y)=>x[1]-y[1]);
+ const weakest=factors[0][0], v=factors[0][1];
+ let msg=o>=.85?'O OEE agregado está em um patamar elevado no conjunto informado. Mantenha o acompanhamento e investigue perdas pontuais.':o>=.65?'O resultado indica espaço para melhoria. Priorize a dimensão com menor percentual e valide as causas no processo.':'O resultado indica perdas relevantes. Recomenda-se um plano de ação estruturado, começando pela dimensão de menor desempenho.';
+ $('analysisBox').innerHTML=`<strong>${status}.</strong><p>O OEE calculado é <strong>${pct(o)}</strong>. A dimensão com menor resultado é <strong>${weakest}</strong> (${pct(v)}). ${msg} ${weakest==='Disponibilidade'?'Investigue paradas não planejadas, setup, manutenção e disponibilidade de materiais.':weakest==='Performance'?'Verifique microparadas, velocidade real, regulagens e perdas de ritmo.':'Avalie refugos, retrabalho, parâmetros de processo e causas de defeitos.'} A interpretação é um direcionador inicial: confirme as causas com observação do processo e dados operacionais.</p>`;
+ drawComponents({a,p,q});drawEquipment(valid);
+}
+function drawComponents(v){
+ const svg=$('componentsChart');if(!v){svg.innerHTML='<text x="300" y="115" text-anchor="middle" fill="#9aabc0">Insira dados para visualizar</text>';return}
+ const vals=[['Disponibilidade',v.a,'#42c6d8'],['Performance',v.p,'#648cff'],['Qualidade',v.q,'#35c58a']];
+ svg.innerHTML=vals.map((x,i)=>{let y=35+i*62,w=Math.max(0,Math.min(100,x[1]*100))*4.2;return `<text x="8" y="${y+12}" fill="#c7d5e5" font-size="13">${x[0]}</text><rect x="145" y="${y}" width="420" height="22" rx="7" fill="#26364c"/><rect x="145" y="${y}" width="${w}" height="22" rx="7" fill="${x[2]}"/><text x="575" y="${y+16}" text-anchor="end" fill="#fff" font-size="13" font-weight="700">${pct(x[1])}</text>`}).join('');
+}
+function drawEquipment(valid){
+ const svg=$('equipmentChart');if(!valid.length){svg.innerHTML='<text x="220" y="115" text-anchor="middle" fill="#9aabc0">Sem dados</text>';return}
+ const groups={};valid.forEach(x=>{const k=x.r.machine; if(!groups[k])groups[k]={p:0,r:0,i:0,t:0,g:0};let z=groups[k];z.p+=x.r.planned;z.r+=x.c.run;z.i+=x.r.cycle/60*x.r.total;z.t+=x.r.total;z.g+=x.r.good});
+ const arr=Object.entries(groups).map(([name,z])=>({name,o:(z.i/z.p)*(z.g/z.t)})).slice(0,6);
+ svg.innerHTML=arr.map((x,i)=>{let y=26+i*33,w=Math.max(0,Math.min(100,x.o*100))*2.65;return `<text x="5" y="${y+12}" fill="#c7d5e5" font-size="11">${esc(x.name).slice(0,16)}</text><rect x="125" y="${y}" width="265" height="17" rx="5" fill="#26364c"/><rect x="125" y="${y}" width="${w}" height="17" rx="5" fill="#648cff"/><text x="430" y="${y+13}" text-anchor="end" fill="#fff" font-size="11">${pct(x.o)}</text>`}).join('');
+}
+function removeRecord(i){records.splice(i,1);save();render();toast('Registro excluído.')}
+$('entryForm').addEventListener('submit',e=>{
+ e.preventDefault();
+ const r={machine:$('machine').value.trim(),date:$('date').value,planned:Number($('planned').value),stop:Number($('stop').value),cycle:Number($('cycle').value),total:Number($('total').value),good:Number($('good').value)};
+ if(!r.machine||!r.date||![r.planned,r.stop,r.cycle,r.total,r.good].every(Number.isFinite)){toast('Preencha todos os campos corretamente.');return}
+ if(r.planned<=0||r.stop<0||r.stop>=r.planned||r.cycle<=0||!Number.isInteger(r.total)||r.total<=0||!Number.isInteger(r.good)||r.good<0||r.good>r.total){toast('Dados incoerentes. Confira os valores informados.');return}
+ const operating=r.planned-r.stop; if((r.cycle/60*r.total)>operating){toast('Performance acima de 100%. Confira ciclo, produção e tempo de operação.');return}
+ records.push(r);save();render();e.target.reset();$('date').value=new Date().toISOString().slice(0,10);toast('Registro adicionado e indicadores atualizados.');
+});
+$('sampleBtn').onclick=()=>{records=[{machine:'Linha 01',date:new Date().toISOString().slice(0,10),planned:480,stop:60,cycle:30,total:700,good:665}];save();render();toast('Caso de exemplo carregado.')};
+$('importBtn').onclick=()=>$('csvFile').click();
+$('csvFile').addEventListener('change',async e=>{
+ const f=e.target.files[0];if(!f)return;const txt=await f.text();const lines=txt.replace(/^\uFEFF/,'').trim().split(/\r?\n/);if(lines.length<2){toast('CSV sem linhas de dados.');return}
+ const parse=line=>{const out=[];let cur='',q=false;for(let i=0;i<line.length;i++){let c=line[i];if(c==='"'&&line[i+1]==='"'&&q){cur+='"';i++}else if(c==='"')q=!q;else if(c===','&&!q){out.push(cur);cur=''}else cur+=c}out.push(cur);return out};
+ const head=parse(lines[0]).map(x=>x.trim().toLowerCase());const keys=['machine','date','planned','stop','cycle','total','good'];const aliases={machine:['machine','equipamento','linha'],date:['date','data'],planned:['planned','tempo_planejado','planejado'],stop:['stop','paradas','downtime'],cycle:['cycle','ciclo'],total:['total','pecas_produzidas','produzidas'],good:['good','pecas_boas','boas']};
+ const idx={};keys.forEach(k=>idx[k]=head.findIndex(h=>aliases[k].includes(h)));
+ if(keys.some(k=>idx[k]<0)){toast('Cabeçalho não reconhecido. Use o modelo de CSV do relatório.');e.target.value='';return}
+ const imported=[];for(let line of lines.slice(1)){if(!line.trim())continue;const a=parse(line);const n=k=>Number(String(a[idx[k]]??'').replace(',','.'));let r={machine:a[idx.machine],date:a[idx.date],planned:n('planned'),stop:n('stop'),cycle:n('cycle'),total:n('total'),good:n('good')};if(r.machine&&r.date&&r.planned>0&&r.stop>=0&&r.stop<r.planned&&r.cycle>0&&Number.isInteger(r.total)&&r.total>0&&Number.isInteger(r.good)&&r.good>=0&&r.good<=r.total&&(r.cycle/60*r.total)<=(r.planned-r.stop))imported.push(r)}
+ records=records.concat(imported);save();render();toast(imported.length+' registro(s) importado(s).');e.target.value='';
+});
+$('exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify(records,null,2)],{type:'application/json'});download(blob,'oee_dados.json')};
+function download(blob,name){const a=document.createElement('a');const u=URL.createObjectURL(blob);a.href=u;a.download=name;a.click();URL.revokeObjectURL(u)}
+$('printBtn').onclick=()=>window.print();
+$('presentBtn').onclick=()=>{document.body.classList.toggle('presentation');$('presentBtn').textContent=document.body.classList.contains('presentation')?'Sair da apresentação':'Modo apresentação';if(document.body.classList.contains('presentation')&&document.documentElement.requestFullscreen)document.documentElement.requestFullscreen().catch(()=>{});else if(document.fullscreenElement)document.exitFullscreen().catch(()=>{})};
+load();render();
+</script>
+</body>
+</html>
